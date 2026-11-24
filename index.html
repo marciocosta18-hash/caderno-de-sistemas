@@ -53,7 +53,7 @@ select,input{font-family:"JetBrains Mono",monospace;font-size:1rem;color:var(--i
 <section id="p1">
 <div class="card">
 <div class="row">
-<label>Exercício da lista <select id="pre"></select></label>
+
 <label>Tamanho <select id="size"><option value="2">2×2</option><option value="3">3×3</option></select></label>
 </div>
 <div class="scroll"><div id="inp" class="inp"></div></div>
@@ -91,32 +91,19 @@ const P=f=>f[0]<0?"("+S(f)+")":S(f);
 const Z=f=>f[0]===0;
 const toF=v=>F(Math.round(v*1000),1000);
 
-const PRE=[
-{n:"Livre (digite os seus)",N:2,A:[[1,1],[1,-1]],B:[10,2],v:["x","y"]},
-{n:"Exercício 1: apps Android e iOS",N:2,A:[[1,1],[40,60]],B:[18,880],v:["Android","iOS"]},
-{n:"Exercício 2: servidores",N:2,A:[[1,1],[150,300]],B:[12,2550],v:["básicos","avançados"]},
-{n:"Exercício 3: licenças",N:2,A:[[1,1],[250,150]],B:[40,8400],v:["gestão","segurança"]},
-{n:"Exercício 7: apps Android, iOS e Web",N:3,A:[[1,1,1],[40,60,20],[1,-1,-1]],B:[30,1220,0],v:["Android","iOS","Web"]},
-{n:"Exercício 8: servidores em 3 níveis",N:3,A:[[1,1,1],[200,400,600],[0,1,-2]],B:[20,7200,0],v:["básicos","intermediários","avançados"]}
-];
 let N=2,V=["x","y","z"];
-PRE.forEach((p,i)=>$("#pre").insertAdjacentHTML("beforeend",`<option value="${i}">${p.n}</option>`));
 
 function build(A,B){
   const g=$("#inp");g.style.gridTemplateColumns=`repeat(${N},auto) auto auto`;
   let h="";
   for(let i=0;i<N;i++){
-    for(let j=0;j<N;j++)h+=`<input type="number" step="any" aria-label="A ${i+1},${j+1}" id="a${i}${j}" value="${A?A[i][j]:0}">`;
-    h+=`<span class="l">=</span><input type="number" step="any" aria-label="B ${i+1}" id="b${i}" value="${B?B[i]:0}">`;
+    for(let j=0;j<N;j++)h+=`<input type="number" step="any" aria-label="A ${i+1},${j+1}" id="a${i}${j}" placeholder="0">`;
+    h+=`<span class="l">=</span><input type="number" step="any" aria-label="B ${i+1}" id="b${i}" placeholder="0">`;
   }
   g.innerHTML=h;
 }
-function loadPre(){
-  const p=PRE[$("#pre").value];N=p.N;V=p.v;$("#size").value=N;build(p.A,p.B);$("#out").innerHTML="";
-}
-$("#pre").onchange=loadPre;
-$("#size").onchange=()=>{N=+$("#size").value;V=N===2?["x","y"]:["x","y","z"];$("#pre").value=0;build(null,null);$("#out").innerHTML=""};
-loadPre();
+$("#size").onchange=()=>{N=+$("#size").value;V=N===2?["x","y"]:["x","y","z"];build(null,null);$("#out").innerHTML=""};
+build(null,null);
 
 const mat=M=>`<span class="m" style="--c:${M[0].length}">${M.flat().map(x=>`<span>${x}</span>`).join("")}</span>`;
 const sym=["x","y","z"];
@@ -151,7 +138,7 @@ $("#solve").onclick=()=>{
   for(let i=0;i<N;i++){A.push([]);for(let j=0;j<N;j++)A[i].push(toF(+$(`#a${i}${j}`).value||0));B.push(toF(+$(`#b${i}`).value||0))}
   const vars=V.slice(0,N),k=sym.slice(0,N);
   let o="";
-  o+=step("1. Monte o sistema",`<div class="mono">${A.map((r,i)=>eq(r,B[i])).join("<br>")}</div><p>Legenda: ${vars.map((v,i)=>`<b>${k[i]}</b> = ${v}`).join(", ")}.</p>`);
+  o+=step("1. Monte o sistema",`<div class="mono">${A.map((r,i)=>eq(r,B[i])).join("<br>")}</div>`);
   o+=step("2. Escreva na forma A · X = B",`<div class="scroll">${mat(A.map(r=>r.map(S)))}·${mat(k.map(x=>[x]))}=${mat(B.map(b=>[S(b)]))}</div>`);
   const d=det(A);
   let fd;
