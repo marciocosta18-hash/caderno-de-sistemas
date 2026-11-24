@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Caderno de Sistemas</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f1f5f9;--grid:#dbe5ef;--card:#fff;--ink:#16213e;--soft:#5b6785;--line:#c9d5e3;--pen:#0b7a75;--red:#c8372d;--okbg:#e3f4ee;--badbg:#fbe9e7;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1626;--grid:#1a2438;--card:#16203a;--ink:#e8eefc;--soft:#9aa7c7;--line:#2b3a5c;--pen:#4fd1c5;--red:#ff8a80;--okbg:#10332f;--badbg:#3a1f22}}
+:root[data-theme="dark"]{--bg:#0f1626;--grid:#1a2438;--card:#16203a;--ink:#e8eefc;--soft:#9aa7c7;--line:#2b3a5c;--pen:#4fd1c5;--red:#ff8a80;--okbg:#10332f;--badbg:#3a1f22}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background-color:var(--bg);background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:24px 24px;color:var(--ink);font-family:"Bricolage Grotesque",system-ui,sans-serif;line-height:1.55}
+main{max-width:860px;margin:0 auto;padding:28px 16px 60px}
+h1{font-size:clamp(2rem,6vw,3.2rem);font-weight:800;letter-spacing:-.03em;line-height:1.05;margin:0 0 8px}
+.sub{color:var(--soft);margin:0 0 22px;max-width:60ch}
+.tabs{display:flex;gap:8px;margin-bottom:16px}
+.tabs button{font:600 1rem inherit;font-family:inherit;padding:10px 18px;border:2px solid var(--ink);background:var(--card);color:var(--ink);border-radius:10px;cursor:pointer}
+.tabs button[aria-selected=true]{background:var(--ink);color:var(--bg)}
+button:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid var(--pen);outline-offset:2px}
+.card{background:var(--card);border:2px solid var(--ink);border-radius:14px;padding:18px;margin-bottom:16px}
+.row{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-bottom:12px}
+select,input{font-family:"JetBrains Mono",monospace;font-size:1rem;color:var(--ink);background:var(--bg);border:2px solid var(--line);border-radius:8px;padding:8px}
+.go{font-family:inherit;font-weight:800;font-size:1rem;background:var(--pen);color:#fff;border:0;border-radius:10px;padding:11px 20px;cursor:pointer}
+.ghost{font-family:inherit;font-weight:600;background:none;border:2px solid var(--line);color:var(--ink);border-radius:10px;padding:9px 14px;cursor:pointer}
+.scroll{overflow-x:auto;max-width:100%}
+.inp{display:grid;gap:6px;align-items:center;font-family:"JetBrains Mono",monospace}
+.inp input{width:74px;text-align:center}
+.inp .l{color:var(--soft);text-align:center}
+.step{border-left:5px solid var(--pen);padding:4px 0 4px 14px;margin:0 0 20px}
+.step h3{margin:0 0 6px;font-size:1.15rem}
+.mono{font-family:"JetBrains Mono",monospace;font-size:.95rem;overflow-x:auto;padding:2px 0}
+.m{display:inline-grid;grid-template-columns:repeat(var(--c),auto);gap:2px 14px;border-left:2px solid var(--ink);border-right:2px solid var(--ink);border-radius:6px;padding:4px 10px;margin:2px 6px;font-family:"JetBrains Mono",monospace;text-align:center;vertical-align:middle}
+.res{background:var(--okbg);border:2px solid var(--pen);border-radius:12px;padding:12px 16px;font-weight:600}
+.bad{background:var(--badbg);border-color:var(--red)}
+.ok{color:var(--pen);font-weight:800}.no{color:var(--red);font-weight:800}
+.q{font-size:1.15rem;margin:0 0 14px}
+.score{color:var(--soft);font-weight:600}
+@media (prefers-reduced-motion:no-preference){.step{animation:in .25s ease-out}@keyframes in{from{opacity:0}to{opacity:1}}}
+</style>
+</head>
+<body>
+<main>
+<h1>Caderno de Sistemas</h1>
+<p class="sub">Resolva sistemas lineares com matriz inversa e veja cada passo: determinante, adjunta, inversa e conferência. Depois treine com problemas de DSM.</p>
+<div class="tabs" role="tablist">
+<button role="tab" id="t1" aria-selected="true">Resolver</button>
+<button role="tab" id="t2" aria-selected="false">Treinar</button>
+</div>
+
+<section id="p1">
+<div class="card">
+<div class="row">
+<label>Exercício da lista <select id="pre"></select></label>
+<label>Tamanho <select id="size"><option value="2">2×2</option><option value="3">3×3</option></select></label>
+</div>
+<div class="scroll"><div id="inp" class="inp"></div></div>
+<div class="row" style="margin-top:14px"><button class="go" id="solve">Resolver passo a passo</button></div>
+</div>
+<div id="out"></div>
+</section>
+
+<section id="p2" hidden>
+<div class="card">
+<p class="q" id="story"></p>
+<div class="row">
+<label>x = <input id="ax" type="number" style="width:80px"></label>
+<label>y = <input id="ay" type="number" style="width:80px"></label>
+<button class="go" id="chk">Conferir</button>
+<button class="ghost" id="hint">Mostrar o sistema</button>
+<button class="ghost" id="nq">Nova questão</button>
+</div>
+<div id="fb" class="mono"></div>
+<p class="score" id="sc"></p>
+</div>
+</section>
+</main>
+
+<script>
+const $=s=>document.querySelector(s);
+const gcd=(a,b)=>b?gcd(b,a%b):Math.abs(a);
+const F=(n,d=1)=>{if(d<0){n=-n;d=-d}const g=gcd(n,d)||1;return[n/g,d/g]};
+const add=(a,b)=>F(a[0]*b[1]+b[0]*a[1],a[1]*b[1]);
+const sub=(a,b)=>F(a[0]*b[1]-b[0]*a[1],a[1]*b[1]);
+const mul=(a,b)=>F(a[0]*b[0],a[1]*b[1]);
+const div=(a,b)=>F(a[0]*b[1],a[1]*b[0]);
+const S=f=>f[1]===1?String(f[0]):f[0]+"/"+f[1];
+const P=f=>f[0]<0?"("+S(f)+")":S(f);
+const Z=f=>f[0]===0;
+const toF=v=>F(Math.round(v*1000),1000);
+
+const PRE=[
+{n:"Livre (digite os seus)",N:2,A:[[1,1],[1,-1]],B:[10,2],v:["x","y"]},
+{n:"Exercício 1: apps Android e iOS",N:2,A:[[1,1],[40,60]],B:[18,880],v:["Android","iOS"]},
+{n:"Exercício 2: servidores",N:2,A:[[1,1],[150,300]],B:[12,2550],v:["básicos","avançados"]},
+{n:"Exercício 3: licenças",N:2,A:[[1,1],[250,150]],B:[40,8400],v:["gestão","segurança"]},
+{n:"Exercício 7: apps Android, iOS e Web",N:3,A:[[1,1,1],[40,60,20],[1,-1,-1]],B:[30,1220,0],v:["Android","iOS","Web"]},
+{n:"Exercício 8: servidores em 3 níveis",N:3,A:[[1,1,1],[200,400,600],[0,1,-2]],B:[20,7200,0],v:["básicos","intermediários","avançados"]}
+];
+let N=2,V=["x","y","z"];
+PRE.forEach((p,i)=>$("#pre").insertAdjacentHTML("beforeend",`<option value="${i}">${p.n}</option>`));
+
+function build(A,B){
+  const g=$("#inp");g.style.gridTemplateColumns=`repeat(${N},auto) auto auto`;
+  let h="";
+  for(let i=0;i<N;i++){
+    for(let j=0;j<N;j++)h+=`<input type="number" step="any" aria-label="A ${i+1},${j+1}" id="a${i}${j}" value="${A?A[i][j]:0}">`;
+    h+=`<span class="l">=</span><input type="number" step="any" aria-label="B ${i+1}" id="b${i}" value="${B?B[i]:0}">`;
+  }
+  g.innerHTML=h;
+}
+function loadPre(){
+  const p=PRE[$("#pre").value];N=p.N;V=p.v;$("#size").value=N;build(p.A,p.B);$("#out").innerHTML="";
+}
+$("#pre").onchange=loadPre;
+$("#size").onchange=()=>{N=+$("#size").value;V=N===2?["x","y"]:["x","y","z"];$("#pre").value=0;build(null,null);$("#out").innerHTML=""};
+loadPre();
+
+const mat=M=>`<span class="m" style="--c:${M[0].length}">${M.flat().map(x=>`<span>${x}</span>`).join("")}</span>`;
+const sym=["x","y","z"];
+function eq(r,b){
+  let t="";r.forEach((c,j)=>{if(Z(c))return;const neg=c[0]<0,a=F(Math.abs(c[0]),c[1]);
+    t+=(t?(neg?" − ":" + "):(neg?"−":""))+(S(a)==="1"?"":S(a))+sym[j]});
+  return (t||"0")+" = "+S(b);
+}
+function det(M){
+  const n=M.length;
+  if(n===1)return M[0][0];
+  if(n===2)return sub(mul(M[0][0],M[1][1]),mul(M[0][1],M[1][0]));
+  let d=F(0);
+  for(let j=0;j<n;j++){const t=mul(M[0][j],det(minor(M,0,j)));d=j%2?sub(d,t):add(d,t)}
+  return d;
+}
+const minor=(M,i,j)=>M.filter((_,r)=>r!==i).map(r=>r.filter((_,c)=>c!==j));
+function rank(M){
+  M=M.map(r=>r.slice());let r=0;
+  for(let c=0;c<M[0].length&&r<M.length;c++){
+    let p=-1;for(let i=r;i<M.length;i++)if(!Z(M[i][c])){p=i;break}
+    if(p<0)continue;[M[r],M[p]]=[M[p],M[r]];
+    for(let i=r+1;i<M.length;i++){const f=div(M[i][c],M[r][c]);M[i]=M[i].map((x,k)=>sub(x,mul(f,M[r][k])))}
+    r++;
+  }
+  return r;
+}
+const step=(t,h)=>`<div class="step"><h3>${t}</h3>${h}</div>`;
+
+$("#solve").onclick=()=>{
+  const A=[],B=[];
+  for(let i=0;i<N;i++){A.push([]);for(let j=0;j<N;j++)A[i].push(toF(+$(`#a${i}${j}`).value||0));B.push(toF(+$(`#b${i}`).value||0))}
+  const vars=V.slice(0,N),k=sym.slice(0,N);
+  let o="";
+  o+=step("1. Monte o sistema",`<div class="mono">${A.map((r,i)=>eq(r,B[i])).join("<br>")}</div><p>Legenda: ${vars.map((v,i)=>`<b>${k[i]}</b> = ${v}`).join(", ")}.</p>`);
+  o+=step("2. Escreva na forma A · X = B",`<div class="scroll">${mat(A.map(r=>r.map(S)))}·${mat(k.map(x=>[x]))}=${mat(B.map(b=>[S(b)]))}</div>`);
+  const d=det(A);
+  let fd;
+  if(N===2)fd=`${P(A[0][0])}·${P(A[1][1])} − ${P(A[0][1])}·${P(A[1][0])}`;
+  else fd=[0,1,2].map(j=>`${j===0?"":j===1?" − ":" + "}${P(A[0][j])}·det${j+1}`).join("")+`<br>onde det1, det2, det3 são os determinantes 2×2 que sobram ao tirar a linha 1 e cada coluna.`;
+  o+=step("3. Calcule o determinante",`<div class="mono">det(A) = ${fd}<br>det(A) = <b>${S(d)}</b></div>`+(Z(d)?`<p class="no">Determinante zero: A não tem inversa.</p>`:`<p>Determinante diferente de zero, então A tem inversa.</p>`));
+  if(!Z(d)){
+    const C=A.map((r,i)=>r.map((_,j)=>{const m=det(minor(A,i,j));return (i+j)%2?F(-m[0],m[1]):m}));
+    const adj=C[0].map((_,j)=>C.map(r=>r[j]));
+    const inv=adj.map(r=>r.map(x=>div(x,d)));
+    o+=step("4. Matriz de cofatores",`<p>Cada posição vale (−1)<sup>i+j</sup> vezes o determinante que sobra ao riscar a linha i e a coluna j.</p><div class="scroll">${mat(C.map(r=>r.map(S)))}</div>`);
+    o+=step("5. Adjunta e inversa",`<p>Adjunta = cofatores transpostos (linhas viram colunas). Depois divida tudo por det(A) = ${S(d)}.</p><div class="scroll">${mat(adj.map(r=>r.map(S)))} → A⁻¹ = ${mat(inv.map(r=>r.map(S)))}</div>`);
+    const X=inv.map(r=>r.reduce((s,c,j)=>add(s,mul(c,B[j])),F(0)));
+    o+=step("6. Calcule X = A⁻¹ · B",`<div class="mono">${inv.map((r,i)=>`${k[i]} = ${r.map((c,j)=>`${P(c)}·${P(B[j])}`).join(" + ")} = <b>${S(X[i])}</b>`).join("<br>")}</div>`);
+    const chk=A.map((r,i)=>{const t=r.reduce((s,c,j)=>add(s,mul(c,X[j])),F(0));return `${r.map((c,j)=>`${P(c)}·${P(X[j])}`).join(" + ")} = ${S(t)} ${S(t)===S(B[i])?'<span class="ok">✓</span>':'<span class="no">✗</span>'}`});
+    o+=step("7. Confira na equação original",`<div class="mono">${chk.join("<br>")}</div>`);
+    const okInt=X.every(x=>x[1]===1&&x[0]>=0);
+    o+=`<div class="res">Sistema Possível e Determinado (SPD).<br>${X.map((x,i)=>`${vars[i]}: ${S(x)}`).join(" · ")}`+(okInt?"":`<br><span class="no">Atenção: no contexto de contagem, a resposta deveria ser inteira e não negativa. Revise as equações.</span>`)+`</div>`;
+  }else{
+    const ra=rank(A),rb=rank(A.map((r,i)=>[...r,B[i]]));
+    o+=step("4. Classifique pelo posto",`<p>Posto de A = ${ra} e posto de [A | B] = ${rb}.</p>`);
+    o+=rb>ra?`<div class="res bad">Sistema Impossível (SI): não existe solução.</div>`:`<div class="res bad">Sistema Possível e Indeterminado (SPI): infinitas soluções.</div>`;
+  }
+  $("#out").innerHTML=o;
+  $("#out").scrollIntoView({behavior:"smooth"});
+};
+
+/* Treino */
+let cur,right=0,tot=0;
+const PR=[[80,120,"horas de Front-end","horas de Back-end","R$ por hora"],[150,300,"servidores básicos","servidores avançados","R$ por mês"],[20,50,"clientes do plano Básico","clientes do plano Premium","R$ por mês"],[250,150,"licenças de gestão","licenças de segurança","R$ por licença"]];
+function nq(){
+  const p=PR[Math.floor(Math.random()*PR.length)];
+  const x=1+Math.floor(Math.random()*12),y=1+Math.floor(Math.random()*12);
+  cur={x,y,p,t:x+y,r:p[0]*x+p[1]*y};
+  $("#story").innerHTML=`Uma equipe tem <b>${cur.t}</b> itens entre <b>${p[2]}</b> (${p[0]} ${p[4]}) e <b>${p[3]}</b> (${p[1]} ${p[4]}). O total foi <b>${cur.r}</b>. Quantos de cada? Use x para ${p[2]} e y para ${p[3]}.`;
+  $("#ax").value=$("#ay").value="";$("#fb").innerHTML="";
+}
+$("#nq").onclick=nq;
+$("#hint").onclick=()=>{$("#fb").innerHTML=`x + y = ${cur.t}<br>${cur.p[0]}x + ${cur.p[1]}y = ${cur.r}<br>Monte A, calcule det, A⁻¹ e X = A⁻¹·B.`};
+$("#chk").onclick=()=>{
+  const x=+$("#ax").value,y=+$("#ay").value;tot++;
+  if(x===cur.x&&y===cur.y){right++;$("#fb").innerHTML=`<span class="ok">Correto! x = ${cur.x}, y = ${cur.y}.</span>`}
+  else $("#fb").innerHTML=`<span class="no">Ainda não.</span> Confira: ${cur.p[0]}·${x} + ${cur.p[1]}·${y} = ${cur.p[0]*x+cur.p[1]*y}, mas o total deveria ser ${cur.r}. Use "Mostrar o sistema" se travar.`;
+  $("#sc").textContent=`Acertos: ${right} de ${tot}`;
+};
+nq();
+
+/* Abas */
+function tab(n){
+  $("#p1").hidden=n!==1;$("#p2").hidden=n!==2;
+  $("#t1").setAttribute("aria-selected",n===1);$("#t2").setAttribute("aria-selected",n===2);
+}
+$("#t1").onclick=()=>tab(1);$("#t2").onclick=()=>tab(2);
+</script>
+</body>
+</html>
